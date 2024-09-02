@@ -2,19 +2,19 @@ from typing import Annotated
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from sqlmodel import Session, select
 from passlib.context import CryptContext
+from sqlmodel import Session, select
 
-from db_models import UserCreate, User, UserPublic
-from dependencies import get_session
+from app.db_models import UserCreate, User, UserPublic
+from app.dependencies import get_session
 from settings import settings
 
-app = FastAPI()
+router = APIRouter(prefix="/user")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -36,12 +36,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-@app.get("/items/")
-async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"token": token}
-
-
-@app.post("/users/create/", response_model=UserPublic)
+@router.post("/create", response_model=UserPublic)
 async def signup(
     new_user: UserCreate,
     session: Session = Depends(get_session),
@@ -55,7 +50,7 @@ async def signup(
     return db_user
 
 
-@app.post("/token/")
+@router.post("/token")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Session = Depends(get_session),
@@ -72,3 +67,8 @@ async def login(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/items/")
+async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"token": token}
