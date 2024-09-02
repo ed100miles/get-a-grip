@@ -15,7 +15,7 @@ from settings import settings
 app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-pwd_context = CryptContext(schemes=["bcrypt"])
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Token(BaseModel):
@@ -65,8 +65,7 @@ async def login(
     ).one_or_none()
     if not user:
         raise HTTPException(status_code=400, detail="Unknown username")
-    hashed_password = pwd_context.hash(form_data.password)
-    if not hashed_password == user.hashed_password:
+    if not pwd_context.verify(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
