@@ -2,19 +2,18 @@ from typing import Annotated
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from sqlmodel import Session, select
 
-from app.db_models import UserCreate, User, UserPublic
-from app.dependencies import get_session
+from ..db_models import UserCreate, User, UserPublic
+from ..dependencies import get_session, oauth2_scheme
 from settings import settings
 
 router = APIRouter(prefix="/user")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -37,7 +36,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 @router.post("/create", response_model=UserPublic)
-async def signup(
+async def create_new_user(
     new_user: UserCreate,
     session: Session = Depends(get_session),
 ):
@@ -69,6 +68,43 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@router.get("/items/")
-async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"token": token}
+@router.get("/me", response_model=UserPublic)
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    session: Session = Depends(get_session),
+):
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        username: str | None = payload.get("sub")
+        if not username:
+            raise ValueError("Invalid token payload")
+
+        selected_user = session.exec(
+            select(User).where(User.username == username)
+        ).one_or_none()
+
+        if not selected_user:
+            raise ValueError("User not found")
+
+        return selected_user
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+            headers={"WWW-Authenticate": "Bearer"},
+        )
