@@ -1,16 +1,17 @@
-from typing import Annotated
 from datetime import datetime, timedelta, timezone
+from typing import Annotated
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
 from passlib.context import CryptContext
+from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from ..models import UserCreate, User, UserPublic
-from ..dependencies import get_session, oauth2_scheme
 from settings import settings
+
+from ..dependencies import get_session, oauth2_scheme
+from ..models import User, UserCreate, UserPublic
 
 router = APIRouter(prefix="/user")
 
@@ -63,7 +64,8 @@ async def login(
         raise HTTPException(status_code=400, detail="Incorrect password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "user_id": user.id},
+        expires_delta=access_token_expires,
     )
     return Token(access_token=access_token, token_type="bearer")
 
