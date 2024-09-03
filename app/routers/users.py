@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from sqlmodel import Session, select
 
-from ..db_models import UserCreate, User, UserPublic
+from ..models import UserCreate, User, UserPublic
 from ..dependencies import get_session, oauth2_scheme
 from settings import settings
 
