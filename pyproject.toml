@@ -11,5 +11,5 @@ dependencies = [
     "pydantic-settings>=2.4.0",
     "pyjwt>=2.9.0",
     "sqlmodel",
-    "strawberry-graphql[debug-server]>=0.239.0",
+    "strawberry-graphql[debug-server,fastapi]>=0.239.0",
 ]

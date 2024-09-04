@@ -151,7 +151,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyjwt" },
     { name = "sqlmodel" },
-    { name = "strawberry-graphql", extra = ["debug-server"] },
+    { name = "strawberry-graphql", extra = ["debug-server", "fastapi"] },
 ]
 
 [package.metadata]
@@ -162,7 +162,7 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2.4.0" },
     { name = "pyjwt", specifier = ">=2.9.0" },
     { name = "sqlmodel" },
-    { name = "strawberry-graphql", extras = ["debug-server"], specifier = ">=0.239.0" },
+    { name = "strawberry-graphql", extras = ["debug-server", "fastapi"], specifier = ">=0.239.0" },
 ]
 
 [[package]]
@@ -580,6 +580,10 @@ debug-server = [
     { name = "starlette" },
     { name = "typer" },
     { name = "uvicorn" },
+]
+fastapi = [
+    { name = "fastapi" },
+    { name = "python-multipart" },
 ]
 
 [[package]]
