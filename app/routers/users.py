@@ -13,7 +13,7 @@ from settings import settings
 from ..dependencies import get_session, oauth2_scheme
 from ..models import User, UserCreate, UserPublic
 
-router = APIRouter(prefix="/user")
+router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

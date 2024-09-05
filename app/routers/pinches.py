@@ -9,7 +9,7 @@ from settings import settings
 from ..dependencies import get_session, oauth2_scheme
 from ..models import Pinch, PinchCreate
 
-router = APIRouter(prefix="/pinch")
+router = APIRouter()
 
 
 @router.post("/create", response_model=Pinch)

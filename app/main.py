@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
-from .routers import graphql_route, pinches, users
+from .routers import graphql, pinches, users
 
 app = FastAPI()
-app.include_router(users.router)
-app.include_router(pinches.router)
-app.include_router(graphql_route.router, prefix="/graphql")
+app.include_router(users.router, prefix="/user")
+app.include_router(pinches.router, prefix="/pinch")
+app.include_router(
+    graphql.router, prefix="/graphql", dependencies=[Depends(users.oauth2_scheme)]
+)
