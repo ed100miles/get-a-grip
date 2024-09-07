@@ -1,7 +1,10 @@
-Testing
- - setup a testing db
- - setup api tests
+- [x] Testing
 
-Get userId from token in create pinches - else folk can guess other user ids and edit thier records
+  - [x] setup a testing db
+  - [x] setup api tests
 
-Email verification
+- [ ] Get userId from token in create pinches - else folk can guess other user ids and edit thier records
+
+- [ ] Email verification
+
+- [ ] Build a frontend!

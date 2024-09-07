@@ -22,15 +22,20 @@ class Token(BaseModel):
     token_type: str
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
+class TokenData(BaseModel):
+    user_id: int
+    sub: str
+    exp: datetime | None = None
+
+
+def create_access_token(data: TokenData, expires_delta: timedelta | None = None):
     if expires_delta:
         expire = datetime.now(UTC) + expires_delta
     else:
         expire = datetime.now(UTC) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    to_encode = data.model_copy(update={"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode.model_dump(), settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
 
@@ -63,7 +68,7 @@ async def login(
         raise HTTPException(status_code=400, detail="Incorrect password")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "user_id": user.id},
+        data=TokenData(sub=user.username, user_id=user.id),
         expires_delta=access_token_expires,
     )
     return Token(access_token=access_token, token_type="bearer")

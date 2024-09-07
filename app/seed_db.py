@@ -1,3 +1,5 @@
+from typing import Final
+
 from faker import Faker
 from sqlmodel import Session
 
@@ -8,23 +10,27 @@ from .routers.users import pwd_context
 fake = Faker()
 Faker.seed(1234)
 
+NUM_SEED_PINCHES_PER_USER: Final = 100
 
-def seed_db(session: Session):
+seed_users = [
+    User(
+        username=fake.user_name(),
+        email=fake.email(),
+        hashed_password=pwd_context.hash(fake.password()),
+    )
+    for _ in range(10)
+] + [
+    User(
+        username="test",
+        email="test@mail.com",
+        hashed_password=pwd_context.hash("test"),
+    )
+]
+
+
+def seed_db(session: Session, seed_users=seed_users):
     # Create 10 users + 1 test user
-    seed_users = [
-        User(
-            username=fake.user_name(),
-            email=fake.email(),
-            hashed_password=pwd_context.hash(fake.password()),
-        )
-        for _ in range(10)
-    ] + [
-        User(
-            username="test",
-            email="test@mail.com",
-            hashed_password=pwd_context.hash("test"),
-        )
-    ]
+
     session.add_all(seed_users)
     session.commit()
     for user in seed_users:
@@ -33,7 +39,7 @@ def seed_db(session: Session):
     # create some pinches for the users
     seed_pinches = []
     for user in seed_users:
-        for _ in range(100):
+        for _ in range(NUM_SEED_PINCHES_PER_USER):
             seed_pinches.append(
                 Pinch(
                     wide=fake.boolean(),
