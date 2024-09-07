@@ -1,5 +1,3 @@
-import typing
-
 import strawberry
 from sqlmodel import Session, select
 from strawberry.fastapi import GraphQLRouter
@@ -19,7 +17,7 @@ class PinchType:
 @strawberry.type
 class Query:
     @strawberry.field
-    def pinches() -> typing.List[PinchType]:
+    def pinches() -> list[PinchType]:
         with Session(engine) as session:
             pinches = session.exec(select(Pinch)).all()
         return [

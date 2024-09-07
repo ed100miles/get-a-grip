@@ -1,6 +1,7 @@
 from faker import Faker
 from sqlmodel import Session
-from app.models import engine, User, Pinch
+
+from app.models import Pinch, User, engine
 from app.routers.users import pwd_context
 
 fake = Faker()
