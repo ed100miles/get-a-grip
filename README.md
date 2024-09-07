@@ -9,6 +9,7 @@ The climbing grip strength tracker.
 3. activate it with `source venv/bin/activate`
 4. install the packages with `uv pip install -r pyproject.toml`
 5. create a local sqlite db and tables with `uv run app/models.py`
-6. spin up the dev server with `fastapi dev app/main.py` (or `fastapi run` for prod)
-7. you can see the strawberry GraphiQL ui at [http://localhost:8000/graphql](http://localhost:8000/graphql)
-8. go build the rest of the app...
+6. seed it with `uv run seed_db.py`
+7. spin up the dev server with `uv run fastapi dev` (or `fastapi run` for prod)
+8. you can see the strawberry GraphiQL ui at [http://localhost:8000/graphql](http://localhost:8000/graphql)
+9. go build the rest of the app...
