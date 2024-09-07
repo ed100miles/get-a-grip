@@ -68,3 +68,34 @@ class TestGraphQLRoute:
         assert pinch_results[0]["deep"]
         # convert datetime string to datetime object to check it's valid
         datetime.strptime(pinch_results[0]["createdAt"], datetime_format)
+
+    def test_mutation_add_pinch(self, client, test_user_token):
+        response = client.post(
+            "/graphql",
+            json={
+                "query": """
+                    mutation {
+                        addPinch(
+                            wide: true,
+                            deep: true,
+                            weight: 5.0,
+                            duration: 5.0
+                        ) {
+                            id userId wide deep weight duration createdAt
+                        }
+                    }
+                    """
+            },
+            headers={"Authorization": f"Bearer {test_user_token}"},
+        )
+        assert response.status_code == 200
+        response_json = dict(response.json())
+        pinch_result = response_json["data"]["addPinch"]
+        assert pinch_result["userId"] == 11
+        assert pinch_result["wide"]
+        assert pinch_result["deep"]
+        assert pinch_result["weight"] == 5.0
+        assert pinch_result["duration"] == 5.0
+        # convert datetime string to datetime object to check it's valid
+        datetime.strptime(pinch_result["createdAt"], datetime_format)
+        assert pinch_result["id"] == NUM_SEED_PINCHES_PER_USER * len(seed_users) + 1

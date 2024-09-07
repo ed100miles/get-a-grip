@@ -1,21 +1,29 @@
 from datetime import datetime
 
+import jwt
 import strawberry
 from fastapi import Depends
 from sqlmodel import Session, select
 from strawberry.fastapi import BaseContext, GraphQLRouter
 
-from ..dependencies import get_session
+from ..dependencies import get_session, oauth2_scheme
 from ..models import Pinch
+from ..settings import settings
+from .users import TokenData
 
 
 class CustomContext(BaseContext):
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, token_data: TokenData | None = None):
         self.session = session
+        self.token_data = token_data
 
 
-def create_context(session: Session = Depends(get_session)):
-    return CustomContext(session=session)
+def create_context(
+    token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)
+):
+    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    token_data = TokenData.model_validate(payload)
+    return CustomContext(session=session, token_data=token_data)
 
 
 @strawberry.type
@@ -34,7 +42,6 @@ class Mutation:
     @strawberry.mutation()
     def add_pinch(
         self,
-        user_id: int,
         wide: bool,
         deep: bool,
         weight: float,
@@ -42,6 +49,7 @@ class Mutation:
         info: strawberry.Info,
     ) -> PinchType:
         session: Session = info.context.session
+        user_id = info.context.token_data.user_id
         pinch = Pinch(
             user_id=user_id,
             wide=wide,
