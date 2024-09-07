@@ -19,6 +19,39 @@ class PinchType:
 
 
 @strawberry.type
+class Mutation:
+    @strawberry.mutation()
+    def add_pinch(
+        self,
+        user_id: int,
+        wide: bool,
+        deep: bool,
+        weight: float,
+        duration: float,
+    ) -> PinchType:
+        with Session(engine) as session:
+            pinch = Pinch(
+                user_id=user_id,
+                wide=wide,
+                deep=deep,
+                weight=weight,
+                duration=duration,
+            )
+            session.add(pinch)
+            session.commit()
+            session.refresh(pinch)
+        return PinchType(
+            id=pinch.id,
+            user_id=pinch.user_id,
+            wide=pinch.wide,
+            deep=pinch.deep,
+            weight=pinch.weight,
+            duration=pinch.duration,
+            created_at=pinch.created_at,
+        )
+
+
+@strawberry.type
 class Query:
     @strawberry.field
     def pinches(
@@ -68,5 +101,5 @@ class Query:
         ]
 
 
-schema = strawberry.Schema(query=Query)
+schema = strawberry.Schema(query=Query, mutation=Mutation)
 router = GraphQLRouter(schema)
