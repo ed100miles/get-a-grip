@@ -2,8 +2,9 @@ from datetime import UTC, datetime
 
 from sqlmodel import Field, Relationship, SQLModel, create_engine
 
-sqlite_url = "sqlite:///db.db"
-engine = create_engine(sqlite_url, echo=True)
+from .settings import settings
+
+engine = create_engine(settings.DB_URL, echo=True)
 
 
 class UserBase(SQLModel):
@@ -46,4 +47,8 @@ def create_db_and_tables() -> None:
 
 
 if __name__ == "__main__":
+    input(
+        "This will create the database named in your settings.py, "
+        "Press enter to continue."
+    )
     create_db_and_tables()

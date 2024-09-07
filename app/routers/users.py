@@ -8,10 +8,9 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from settings import settings
-
 from ..dependencies import get_session, oauth2_scheme
 from ..models import User, UserCreate, UserPublic
+from ..settings import settings
 
 router = APIRouter()
 

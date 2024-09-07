@@ -4,10 +4,9 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from settings import settings
-
 from ..dependencies import get_session, oauth2_scheme
 from ..models import Pinch, PinchCreate
+from ..settings import settings
 
 router = APIRouter()
 

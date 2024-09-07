@@ -8,10 +8,12 @@ dependencies = [
     "bcrypt==4.0.1",
     "fastapi[standard]>=0.112.2",
     "passlib[bcrypt]>=1.7.4",
+    "psycopg2>=2.9.9",
     "pydantic-settings>=2.4.0",
     "pyjwt>=2.9.0",
     "sqlmodel",
     "strawberry-graphql[debug-server,fastapi]>=0.239.0",
+    "testcontainers>=4.8.1",
 ]
 
 [tool.uv]
