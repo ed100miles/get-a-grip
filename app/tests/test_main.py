@@ -1,9 +1,7 @@
 from datetime import datetime
-from typing import Final
 
+from ..constants import datetime_format
 from ..seed_db import NUM_SEED_PINCHES_PER_USER, seed_users
-
-datetime_format: Final = "%Y-%m-%dT%H:%M:%S.%f"
 
 
 def test_read_main(client):
@@ -25,10 +23,11 @@ class TestUserRoute:
             },
         )
         assert response.status_code == 200
-        response_json = response.json()
-        assert response_json["username"] == "test_user"
-        assert response_json["email"] == "test@mail.com"
-        assert response_json["id"] == 12  # 11 seeded users already
+        assert (
+            response.json()["message"]
+            == "User created successfully - validate email to login"
+        )
+        assert isinstance(response.json()["minutes_to_validate"], int)
 
     def test_login(self, client):
         response = client.post(

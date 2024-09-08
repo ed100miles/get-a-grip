@@ -8,6 +8,7 @@ dependencies = [
     "bcrypt==4.0.1",
     "fastapi-mail>=1.4.1",
     "fastapi[standard]>=0.112.2",
+    "itsdangerous>=2.2.0",
     "passlib[bcrypt]>=1.7.4",
     "psycopg2>=2.9.9",
     "pydantic-settings>=2.4.0",

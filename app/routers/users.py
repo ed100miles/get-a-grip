@@ -1,21 +1,27 @@
+import json
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_mail import FastMail, MessageSchema, MessageType
+from itsdangerous import URLSafeTimedSerializer
+from itsdangerous.exc import BadSignature, SignatureExpired
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
-from ..dependencies import get_session, oauth2_scheme
-from ..mail import send_validation_email
+from ..constants import datetime_format
+from ..dependencies import get_fast_mail, get_session, oauth2_scheme
 from ..models import User, UserCreate, UserPublic
 from ..settings import settings
 
 router = APIRouter()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
 
 class Token(BaseModel):
@@ -41,10 +47,48 @@ def create_access_token(data: TokenData, expires_delta: timedelta | None = None)
     return encoded_jwt
 
 
+def create_url_safe_token(data: UserPublic) -> str:
+    return serializer.dumps(data.model_dump_json())
+
+
+def decode_url_safe_token(token: str) -> UserPublic:
+    try:
+        decoded_token = serializer.loads(
+            token, max_age=settings.VALIDATION_EMAIL_EXPIRE_MINUTES * 60
+        )
+    except SignatureExpired as err:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Too slow! Token expired."
+        ) from err
+    except BadSignature as err:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Uuhhh, this has been tampered with, the police have been called.",
+        ) from err
+    token_data = json.loads(decoded_token)
+    return UserPublic(
+        username=token_data["username"],
+        email=token_data["email"],
+        id=int(token_data["id"]),
+        created_at=datetime.strptime(token_data["created_at"], datetime_format),
+    )
+
+
+async def send_validation_email(mail: FastMail, user: User, subject: str, html: str):
+    message = MessageSchema(
+        subject=subject,
+        recipients=[user.email],
+        body=html,
+        subtype=MessageType.html,
+    )
+    await mail.send_message(message)
+
+
 @router.post("/create")
 async def create_new_user(
     new_user: UserCreate,
     session: Session = Depends(get_session),
+    fast_mail: FastMail = Depends(get_fast_mail),
 ):
     db_user = User.model_validate(
         new_user, update={"hashed_password": pwd_context.hash(new_user.password)}
@@ -52,8 +96,37 @@ async def create_new_user(
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-    await send_validation_email(db_user)
-    return {"message": "User created successfully - validate email to login"}
+    public_user = UserPublic.model_validate(
+        db_user
+    )  # dont want to include hashed password in token just in case!
+    token = create_url_safe_token(public_user)
+    link = f"{settings.DOMAIN}/user/validate/{token}"
+    email_html = f"""
+    <h1>Get A Grip - Validate your email</h1>
+    <p>Click the link below to validate your email and get started with Get A Grip</p>
+    <p>
+    You have {settings.VALIDATION_EMAIL_EXPIRE_MINUTES} minutes to validate your email
+    </p>
+    <a href="{link}">Validate Email</a>
+    """
+    await send_validation_email(
+        fast_mail, db_user, "Get A Grip - Validate your email", email_html
+    )
+    return {
+        "message": "User created successfully - validate email to login",
+        "minutes_to_validate": settings.VALIDATION_EMAIL_EXPIRE_MINUTES,
+    }
+
+
+@router.get("/validate/{token}")
+async def validate_email(token: str, session: Session = Depends(get_session)):
+    token_user = decode_url_safe_token(token)
+    statement = select(User).where(User.id == token_user.id)
+    db_user = session.exec(statement).one()
+    db_user.email_validated = True
+    session.add(db_user)
+    session.commit()
+    return {"message": "Email validated successfully"}
 
 
 @router.post("/token")
