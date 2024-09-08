@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from ..dependencies import get_session, oauth2_scheme
+from ..mail import send_validation_email
 from ..models import User, UserCreate, UserPublic
 from ..settings import settings
 
@@ -40,7 +41,7 @@ def create_access_token(data: TokenData, expires_delta: timedelta | None = None)
     return encoded_jwt
 
 
-@router.post("/create", response_model=UserPublic)
+@router.post("/create")
 async def create_new_user(
     new_user: UserCreate,
     session: Session = Depends(get_session),
@@ -51,7 +52,8 @@ async def create_new_user(
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
-    return db_user
+    await send_validation_email(db_user)
+    return {"message": "User created successfully - validate email to login"}
 
 
 @router.post("/token")

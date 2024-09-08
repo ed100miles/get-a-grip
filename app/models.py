@@ -14,6 +14,7 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int = Field(default=None, primary_key=True)
+    email_validated: bool = False
     hashed_password: str
     pinches: list["Pinch"] = Relationship(back_populates="user")
     created_at: datetime = Field(default_factory=datetime.now)
