@@ -7,8 +7,9 @@
 
 - [ ] Better signup
 
-  - [ ] no duplicate usernames, emails
+  - [x] no duplicate usernames, emails - i think duplicate username should be ok?
   - [x] Email verification
+  - [ ] unvalidated users cant login
   - [ ] Jinja template for email verification
   - [ ] Password reset
 - 🚫 User updates via the graphql? - no!

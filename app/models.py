@@ -9,7 +9,7 @@ engine = create_engine(settings.DB_URL, echo=True)
 
 class UserBase(SQLModel):
     username: str
-    email: str
+    email: str = Field(unique=True)
 
 
 class User(UserBase, table=True):

@@ -18,7 +18,7 @@ class TestUserRoute:
             "/user/create",
             json={
                 "username": "test_user",
-                "email": "test@mail.com",
+                "email": "test@testmail.com",
                 "password": "test_password",
             },
         )
@@ -28,6 +28,18 @@ class TestUserRoute:
             == "User created successfully - validate email to login"
         )
         assert isinstance(response.json()["minutes_to_validate"], int)
+
+    def test_create_new_user_existing_email(self, client):
+        response = client.post(
+            "/user/create",
+            json={
+                "username": "test_user",
+                "email": "test@mail.com",
+                "password": "test_password",
+            },
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Email already registered"
 
     def test_login(self, client):
         response = client.post(
