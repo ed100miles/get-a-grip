@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate your email - Get A Grip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        p {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        a {
+            display: inline-block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #2980b9;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>&#128074; Get A Grip - Validate your email &#128074; </h1>
+        <p>Welcome to Get A Grip!</p>
+        <p>Click the button below to validate your email and get started:</p>
+        <p><a href="{{ validation_link }}">Validate Email</a></p>
+        <p>You have {{ validation_time }} minutes to validate your email.</p>
+        <div class="footer">
+            <p>If you didn’t sign up for Get A Grip, please ignore this email.</p>
+        </div>
+    </div>
+</body>
+</html>

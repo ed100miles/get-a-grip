@@ -75,14 +75,20 @@ def decode_url_safe_token(token: str) -> UserPublic:
     )
 
 
-async def send_validation_email(mail: FastMail, user: User, subject: str, html: str):
+async def send_validation_email(
+    mail: FastMail,
+    user: User,
+    subject: str,
+    template_name: str,
+    template_body: dict,
+):
     message = MessageSchema(
         subject=subject,
         recipients=[user.email],
-        body=html,
+        template_body=template_body,
         subtype=MessageType.html,
     )
-    await mail.send_message(message)
+    await mail.send_message(message, template_name=template_name)
 
 
 @router.post("/create")
@@ -108,17 +114,16 @@ async def create_new_user(
         db_user
     )  # dont want to include hashed password in token just in case!
     token = create_url_safe_token(public_user)
-    link = f"{settings.DOMAIN}/user/validate/{token}"
-    email_html = f"""
-    <h1>Get A Grip - Validate your email</h1>
-    <p>Click the link below to validate your email and get started with Get A Grip</p>
-    <p>
-    You have {settings.VALIDATION_EMAIL_EXPIRE_MINUTES} minutes to validate your email
-    </p>
-    <a href="{link}">Validate Email</a>
-    """
+    validation_link = f"{settings.DOMAIN}/user/validate/{token}"
     await send_validation_email(
-        fast_mail, db_user, "Get A Grip - Validate your email", email_html
+        fast_mail,
+        db_user,
+        "Get A Grip - Validate your email",
+        "email_confirmation.html",
+        {
+            "validation_link": validation_link,
+            "validation_time": settings.VALIDATION_EMAIL_EXPIRE_MINUTES,
+        },
     )
     return {
         "message": "User created successfully - validate email to login",

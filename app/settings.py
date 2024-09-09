@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi_mail import ConnectionConfig
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -38,6 +40,7 @@ mail_config = ConnectionConfig(
     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
     USE_CREDENTIALS=settings.USE_CREDENTIALS,
     VALIDATE_CERTS=settings.VALIDATE_CERTS,
+    TEMPLATE_FOLDER=Path(__file__).parent / "templates",
     SUPPRESS_SEND=0
 )
 
