@@ -51,6 +51,32 @@ class TestUserRoute:
         assert isinstance(response_json["access_token"], str)
         assert response_json["token_type"] == "bearer"
 
+    def test_login_invalid_password(self, client):
+        response = client.post(
+            "/user/token",
+            data={"username": "test", "password": "invalid_password"},
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Incorrect password"
+
+    def test_login_invalid_username(self, client):
+        response = client.post(
+            "/user/token",
+            data={"username": "invalid_username", "password": "test"},
+        )
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Unknown username"
+
+    def test_login_email_not_validated(self, client):
+        response = client.post(
+            "/user/token", data={"username": "test2", "password": "test2"}
+        )
+        assert response.status_code == 400
+        assert (
+            response.json()["detail"]
+            == "Email not validated - please validate your email"
+        )
+
 
 class TestGraphQLRoute:
     def test_query_pinches(self, client, test_user_token):

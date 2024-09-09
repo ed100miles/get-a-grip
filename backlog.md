@@ -12,7 +12,7 @@
   - [ ] unvalidated users cant login
   - [ ] Jinja template for email verification
   - [ ] Password reset
-- 🚫 User updates via the graphql? - no!
+🚫 User updates via the graphql? - no!
     - It's nice to allow gql access only to authed users, so create has to be outside, we dont want read / update / delete inside else it's messy. So keep all user management in the existing users route.
 
 - [ ] Even better signup

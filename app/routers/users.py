@@ -149,6 +149,10 @@ async def login(
         raise HTTPException(status_code=400, detail="Unknown username")
     if not pwd_context.verify(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect password")
+    if not user.email_validated:
+        raise HTTPException(
+            status_code=400, detail="Email not validated - please validate your email"
+        )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data=TokenData(sub=user.username, user_id=user.id),

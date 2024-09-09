@@ -17,6 +17,7 @@ seed_users = [
         username=fake.user_name(),
         email=fake.email(),
         hashed_password=pwd_context.hash(fake.password()),
+        email_validated=True,
     )
     for _ in range(10)
 ] + [
@@ -24,7 +25,14 @@ seed_users = [
         username="test",
         email="test@mail.com",
         hashed_password=pwd_context.hash("test"),
-    )
+        email_validated=True,
+    ),
+    User(
+        username="test2",
+        email="test2@mail.com",
+        hashed_password=pwd_context.hash("test2"),
+        email_validated=False,
+    ),
 ]
 
 
