@@ -12,4 +12,5 @@ The climbing grip strength tracker.
 6. seed it with `uv run python -m app.seed_db`
 7. spin up the dev server with `uv run fastapi dev` (or `fastapi run` for prod)
 8. you can see the strawberry GraphiQL ui at [http://localhost:8000/graphql](http://localhost:8000/graphql)
-9. go build the rest of the app...
+9. to start dev frontend, cd into frontend and run `npm run dev`. (alternatively `npm run start` for production build and serve.
+10. go build the rest of the app...

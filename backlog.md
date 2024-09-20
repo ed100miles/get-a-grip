@@ -9,6 +9,7 @@
 
   - [x] no duplicate usernames, emails - i think duplicate username should be ok?
   - [x] Email verification
+  - [ ] resend verification email
   - [x] unvalidated users cant login
   - [x] Jinja template for email verification
   - [ ] Password reset
@@ -25,6 +26,10 @@
 
 - [ ] Build a frontend!
 
-  - [ ] Create react app - that's it right?
+  - [ ] Remix basic setup
+  - [ ] Signup flow
+  - [ ] Login
+  - [ ] Add a pinch
+  - [ ] View pinches data viz
 
 - [ ] Deploy the app!
