@@ -6,7 +6,7 @@ The climbing grip strength tracker.
 
 1. install [uv](https://docs.astral.sh/uv/)
 2. create an environment with `uv venv`
-3. activate it with `source venv/bin/activate`
+3. activate it with `source .venv/bin/activate`
 4. install the packages with `uv pip install -r pyproject.toml`
 5. create a local sqlite db and tables with `uv run python -m app.models`
 6. seed it with `uv run python -m app.seed_db`

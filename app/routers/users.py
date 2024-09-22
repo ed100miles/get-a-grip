@@ -28,6 +28,7 @@ serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 class Token(BaseModel):
     access_token: str
     token_type: str
+    user_id: int
 
 
 class TokenData(BaseModel):
@@ -163,7 +164,7 @@ async def login(
         data=TokenData(sub=user.username, user_id=user.id),
         expires_delta=access_token_expires,
     )
-    return Token(access_token=access_token, token_type="bearer")
+    return Token(access_token=access_token, token_type="bearer", user_id=user.id)
 
 
 @router.get("/me", response_model=UserPublic)

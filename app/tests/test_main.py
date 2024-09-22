@@ -50,6 +50,7 @@ class TestUserRoute:
         response_json = response.json()
         assert isinstance(response_json["access_token"], str)
         assert response_json["token_type"] == "bearer"
+        assert response_json["user_id"] == 11
 
     def test_login_invalid_password(self, client):
         response = client.post(
