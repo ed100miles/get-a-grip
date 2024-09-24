@@ -13,8 +13,7 @@
   - [x] unvalidated users cant login
   - [x] Jinja template for email verification
   - [ ] Password reset
-🚫 User updates via the graphql? - no!
-    - It's nice to allow gql access only to authed users, so create has to be outside, we dont want read / update / delete inside else it's messy. So keep all user management in the existing users route.
+        🚫 User updates via the graphql? - no! - It's nice to allow gql access only to authed users, so create has to be outside, we dont want read / update / delete inside else it's messy. So keep all user management in the existing users route.
 
 - [ ] Even better signup
 
@@ -26,9 +25,11 @@
 
 - [ ] Build a frontend!
 
-  - [ ] Remix basic setup
-  - [ ] Signup flow
-  - [ ] Login
+  - [x] Remix basic setup
+  - [x] Signup flow
+  - [x] Login
+  - [ ] Logout
+  - [ ] Dashboard
   - [ ] Add a pinch
   - [ ] View pinches data viz
 
