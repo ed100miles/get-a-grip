@@ -7,8 +7,10 @@ import {
 	useLoaderData,
 	useSubmit,
 } from "@remix-run/react";
+import type { PinchType } from "gql/graphql";
 import { request as gqlRequest } from "graphql-request";
 import GetPinches from "../../gqlQueries/getPinches";
+import { PinchLineChart } from "../components/lineChart";
 import { getSession } from "../sessions";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -162,15 +164,7 @@ const Dashboard = () => {
 					</Form>
 				</div>
 			</div>
-			<div className="bg-slate-900 h-full w-3/4 overflow-auto flex flex-col items-center p-4">
-				{pinches.map((pinch) => (
-					<div key={pinch.id} className="text-slate-300 w-full flex">
-						{pinch.wide ? "Wide" : "Narrow"} Grip{" "}
-						{pinch.deep ? "Deep" : "Shallow"} Grip {pinch.weight}kg{" "}
-						{pinch.duration}s
-					</div>
-				))}
-			</div>
+			<PinchLineChart data={pinches as PinchType[]} />
 		</div>
 	);
 };
