@@ -1,0 +1,20 @@
+"""Date with time (isoformat)"""
+scalar DateTime
+
+type Mutation {
+  addPinch(wide: Boolean!, deep: Boolean!, weight: Float!, duration: Float!): PinchType!
+}
+
+type PinchType {
+  id: Int!
+  userId: Int!
+  wide: Boolean!
+  deep: Boolean!
+  weight: Float!
+  duration: Float!
+  createdAt: DateTime!
+}
+
+type Query {
+  pinches(userId: Int = null, wide: Boolean = null, deep: Boolean = null, minWeight: Float = null, maxWeight: Float = null, minDuration: Float = null, maxDuration: Float = null, createdAfter: DateTime = null, createdBefore: DateTime = null): [PinchType!]!
+}
