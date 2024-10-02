@@ -107,6 +107,21 @@ class TestGraphQLRoute:
         # convert datetime string to datetime object to check it's valid
         datetime.strptime(pinch_results[0]["createdAt"], datetime_format)
 
+    def test_query_pinches_get_request(self, client, test_user_token):
+        response = client.get(
+            "/graphql?query={pinches{id,userId,wide,deep,weight,duration,createdAt}}",
+            headers={"Authorization": f"Bearer {test_user_token}"},
+        )
+        response_json = dict(response.json())
+        pinch_results = response_json["data"]["pinches"]
+        assert len(pinch_results) == NUM_SEED_PINCHES_PER_USER * len(seed_users)
+        assert pinch_results[0]["id"] == 1
+        assert pinch_results[0]["userId"] == 1
+        assert pinch_results[0]["duration"] == 6.5348866156918275
+        assert pinch_results[0]["weight"] == 5.048719016670407
+        assert pinch_results[0]["wide"]
+        assert pinch_results[0]["deep"]
+
     def test_mutation_add_pinch(self, client, test_user_token):
         response = client.post(
             "/graphql",
