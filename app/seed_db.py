@@ -1,3 +1,4 @@
+import datetime
 from typing import Final
 
 from faker import Faker
@@ -46,15 +47,18 @@ def seed_db(session: Session, seed_users=seed_users):
 
     # create some pinches for the users
     seed_pinches = []
+    base_time = fake.date_time_between(start_date="-1y", end_date="now")
     for user in seed_users:
-        for _ in range(NUM_SEED_PINCHES_PER_USER):
+        for num in range(NUM_SEED_PINCHES_PER_USER):
             seed_pinches.append(
                 Pinch(
                     wide=fake.boolean(),
                     deep=fake.boolean(),
-                    weight=fake.random.uniform(0.01, 10),
-                    duration=fake.random.uniform(0.01, 10),
+                    weight=fake.random.uniform(num * 0.99, num * 1.01),
+                    duration=fake.random.uniform(20, 60),
                     user_id=user.id,
+                    created_at=base_time
+                    + datetime.timedelta(days=num * fake.random.uniform(0.9, 1.1)),
                 )
             )
     session.add_all(seed_pinches)

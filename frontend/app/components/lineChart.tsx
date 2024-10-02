@@ -42,7 +42,7 @@ const PinchTooltip = ({
 	active,
 	payload,
 }: TooltipProps<ValueType, NameType>) => {
-	if (active && payload && isPinchType(payload[0].payload)) {
+	if (active && payload && isPinchType(payload[0]?.payload)) {
 		const pinch = payload[0].payload;
 		const weight = pinch.weight;
 		const duration = pinch.duration;
