@@ -12,6 +12,9 @@ import { request as gqlRequest } from "graphql-request";
 import GetPinches from "../../gqlQueries/getPinches";
 import { PinchLineChart } from "../components/lineChart";
 import { getSession } from "../sessions";
+import { formatDateTime } from "../../utils/dateTimeUtils";
+
+const DEFAUT_CREATED_AFTER = "2024-01-01";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const session = await getSession(request.headers.get("Cookie"));
@@ -30,6 +33,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const maxWeight = Number(url.searchParams.get("maxWeight")) || 1000;
 	const minDuration = Number(url.searchParams.get("minDuration")) || 0;
 	const maxDuration = Number(url.searchParams.get("maxDuration")) || 1000;
+	const createdAfter =
+		url.searchParams.get("createdAfter") || DEFAUT_CREATED_AFTER;
+	const createdBefore =
+		url.searchParams.get("createdBefore") ||
+		formatDateTime(String(new Date()), true, true);
 
 	const userPinches = await gqlRequest(
 		"http://localhost:8000/graphql",
@@ -42,6 +50,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			maxWeight: maxWeight,
 			minDuration: minDuration,
 			maxDuration: maxDuration,
+			createdAfter: createdAfter,
+			createdBefore: createdBefore,
 		},
 		{
 			Authorization: `Bearer ${jwtToken}`,
@@ -57,10 +67,10 @@ const Dashboard = () => {
 	const submit = useSubmit();
 	return (
 		<div className="h-screen w-screen flex">
-			<div className="h-full w-1/4 border-r-8 border-slate-500 p-5">
-				<div className="border-2 border-slate-300 flex h-full rounded-md">
+			<div className="h-full w-1/4 border-r-8 border-slate-500 p-5 ">
+				<div className="border-2 border-slate-300 h-full rounded-md">
 					<Form
-						className="p-4 h-1/2 flex flex-col justify-evenly"
+						className="p-4 h-full flex flex-col justify-evenly"
 						onChange={(event) => submit(event.currentTarget)}
 					>
 						<fieldset className="flex items-center">
@@ -161,6 +171,36 @@ const Dashboard = () => {
 								/>
 							</fieldset>
 						</div>
+						<fieldset className="flex justify-start mb-3">
+							<label
+								className="text-[15px] leading-none mb-2.5 text-white block"
+								htmlFor="createdAfter"
+							>
+								Created After
+							</label>
+							<input
+								type="date"
+								id="createdAfter"
+								name="createdAfter"
+								defaultValue={DEFAUT_CREATED_AFTER}
+								className="rounded-md"
+							/>
+						</fieldset>
+						<fieldset className="flex justify-start">
+							<label
+								className="text-[15px] leading-none mb-2.5 text-white block"
+								htmlFor="createdBefore"
+							>
+								Created Before
+							</label>
+							<input
+								type="date"
+								id="createdBefore"
+								name="createdBefore"
+								defaultValue={formatDateTime(String(new Date()), true, true)}
+								className="rounded-md"
+							/>
+						</fieldset>
 					</Form>
 				</div>
 			</div>

@@ -14,17 +14,7 @@ import type {
 	NameType,
 	ValueType,
 } from "recharts/types/component/DefaultTooltipContent";
-
-const formatDateTime = (datetime: string, short: boolean) => {
-	const date = new Date(datetime);
-	if (short) {
-		const day = String(date.getDay()).padStart(2, "0");
-		const month = String(date.getMonth() + 1).padStart(2, "0");
-		const year = String(date.getFullYear()).slice(2);
-		return `${day}-${month}-${year}`;
-	}
-	return date.toLocaleString();
-};
+import { formatDateTime } from "../../utils/dateTimeUtils";
 
 // biome-ignore lint/suspicious/noExplicitAny: <type narrowing>
 const isPinchType = (payload: any): payload is PinchType => {
@@ -58,32 +48,37 @@ const PinchTooltip = ({
 	return null;
 };
 
-export const PinchLineChart = ({ data }: { data: PinchType[] }) => (
-	<ResponsiveContainer className="p-4">
-		<LineChart
-			data={data}
-			margin={{
-				top: 5,
-				right: 30,
-				left: 30,
-				bottom: 100,
-			}}
-		>
-			<Line type="monotone" dataKey="weight" stroke="#f1c40f" />
-			<CartesianGrid stroke="#7b7d7d" />
-			<XAxis
-				stroke="#7b7d7d"
-				dataKey="createdAt"
-				tickFormatter={(tick) => formatDateTime(tick, true)}
-				angle={-45}
-				dy={50}
+export const PinchLineChart = ({ data }: { data: PinchType[] }) =>
+	data.length === 0 ? (
+		<div className="p-4 text-slate-300 w-full flex justify-center items-center text-2xl">
+			<p>{"No pinches found. 😟"}</p>
+		</div>
+	) : (
+		<ResponsiveContainer className="p-4">
+			<LineChart
+				data={data}
+				margin={{
+					top: 5,
+					right: 30,
+					left: 30,
+					bottom: 100,
+				}}
 			>
-				<Label value="Time" position="insideBottom" dy={1} />
-			</XAxis>
-			<YAxis stroke="#7b7d7d">
-				<Label value="Weight (kg)" position="insideLeft" angle={-90} />
-			</YAxis>
-			<Tooltip content={<PinchTooltip />} />
-		</LineChart>
-	</ResponsiveContainer>
-);
+				<Line type="monotone" dataKey="weight" stroke="#f1c40f" />
+				<CartesianGrid stroke="#7b7d7d" />
+				<XAxis
+					stroke="#7b7d7d"
+					dataKey="createdAt"
+					tickFormatter={(tick) => formatDateTime(tick, true)}
+					angle={-45}
+					dy={50}
+				>
+					<Label value="Time" position="insideBottom" dy={1} />
+				</XAxis>
+				<YAxis stroke="#7b7d7d">
+					<Label value="Weight (kg)" position="insideLeft" angle={-90} />
+				</YAxis>
+				<Tooltip content={<PinchTooltip />} />
+			</LineChart>
+		</ResponsiveContainer>
+	);

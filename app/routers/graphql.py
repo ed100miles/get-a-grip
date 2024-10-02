@@ -109,18 +109,21 @@ class Query:
         if created_before is not None:
             statement = statement.where(Pinch.created_at <= created_before)
         pinches = session.exec(statement).all()
-        return [
-            PinchType(
-                id=p.id,
-                user_id=p.user_id,
-                wide=p.wide,
-                deep=p.deep,
-                weight=p.weight,
-                duration=p.duration,
-                created_at=p.created_at,
-            )
-            for p in pinches
-        ]
+        return sorted(
+            [
+                PinchType(
+                    id=p.id,
+                    user_id=p.user_id,
+                    wide=p.wide,
+                    deep=p.deep,
+                    weight=p.weight,
+                    duration=p.duration,
+                    created_at=p.created_at,
+                )
+                for p in pinches
+            ],
+            key=lambda p: p.created_at,
+        )
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
